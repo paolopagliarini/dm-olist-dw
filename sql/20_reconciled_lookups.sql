@@ -65,6 +65,9 @@ INSERT INTO reconciled.category_translation (category_pt, category_en) VALUES
 -- 3) Macro-categories: top level of the product hierarchy (product -> category -> macro-category).
 --    Grouping defined by us on the 73 Olist categories; the original names are kept as they are
 --    (including Olist's typos such as 'costruction_tools_garden' or 'home_confort').
+--    Reviewed on 13/09/2026 using price, weight, volume and what else the same sellers sell:
+--    'art' is decorative objects sold by furniture sellers (-> Home), 'arts_and_craftmanship' is craft
+--    supplies sold with stationery (-> Books, Media & Stationery), 'market_place' is Olist's generic bucket.
 -- ---------------------------------------------------------------------------
 -- category_en is unique in the translation file, so it can be referenced by the macro-category table
 ALTER TABLE reconciled.category_translation ADD CONSTRAINT category_translation_en_unique UNIQUE (category_en);
@@ -76,6 +79,9 @@ CREATE TABLE reconciled.macro_category (
 
 INSERT INTO reconciled.macro_category (category_en, macro_category) VALUES
     -- Home & Furniture
+    ('art',                                     'Home & Furniture'),
+    ('party_supplies',                          'Home & Furniture'),
+    ('christmas_supplies',                      'Home & Furniture'),
     ('bed_bath_table',                          'Home & Furniture'),
     ('furniture_decor',                         'Home & Furniture'),
     ('furniture_bedroom',                       'Home & Furniture'),
@@ -87,9 +93,8 @@ INSERT INTO reconciled.macro_category (category_en, macro_category) VALUES
     ('home_confort',                            'Home & Furniture'),
     ('home_comfort_2',                          'Home & Furniture'),
     ('la_cuisine',                              'Home & Furniture'),
-    ('portable_kitchen_and_food_preparers',     'Home & Furniture'),
-    ('flowers',                                 'Home & Furniture'),
     -- Appliances
+    ('portable_kitchen_and_food_preparers',     'Appliances'),
     ('home_appliances',                         'Appliances'),
     ('home_appliances_2',                       'Appliances'),
     ('small_appliances',                        'Appliances'),
@@ -123,8 +128,6 @@ INSERT INTO reconciled.macro_category (category_en, macro_category) VALUES
     ('sports_leisure',                          'Sports & Leisure'),
     ('toys',                                    'Sports & Leisure'),
     ('cool_stuff',                              'Sports & Leisure'),
-    ('party_supplies',                          'Sports & Leisure'),
-    ('christmas_supplies',                      'Sports & Leisure'),
     ('musical_instruments',                     'Sports & Leisure'),
     -- Books, Media & Stationery
     ('books_general_interest',                  'Books, Media & Stationery'),
@@ -134,9 +137,9 @@ INSERT INTO reconciled.macro_category (category_en, macro_category) VALUES
     ('dvds_blu_ray',                            'Books, Media & Stationery'),
     ('music',                                   'Books, Media & Stationery'),
     ('stationery',                              'Books, Media & Stationery'),
-    ('art',                                     'Books, Media & Stationery'),
     ('arts_and_craftmanship',                   'Books, Media & Stationery'),
     -- Tools, Construction & Garden
+    ('flowers',                                 'Tools, Construction & Garden'),
     ('construction_tools_construction',         'Tools, Construction & Garden'),
     ('construction_tools_lights',               'Tools, Construction & Garden'),
     ('construction_tools_safety',               'Tools, Construction & Garden'),
