@@ -22,7 +22,7 @@ OUT = Path(__file__).resolve().parent
 
 FONT = "Helvetica, Arial, sans-serif"
 R = 7            # radius of a dimension-attribute circle
-STEP = 118       # distance between two levels of a hierarchy (horizontal chains)
+STEP = 132       # distance between two levels of a hierarchy (horizontal chains)
 VSTEP = 62       # distance between two levels (vertical chains)
 ROW_GAP = 58     # vertical gap between two hierarchies on the same side
 
@@ -122,7 +122,7 @@ def draw_dfm(fact: Fact, path: Path) -> None:
                     x = prev[0] + direction * STEP
                     svg.line(prev[0], y, x, y)
                 svg.circle(x, y)
-                svg.text(x, y - 13, level, size=12)
+                svg.text(x, y - 13, level, size=13)
                 for di, d in enumerate(h.descriptive.get(level, [])):
                     # descriptive attribute: short line downwards, label at the end, no circle
                     dy = y + 22 + 16 * di
@@ -208,9 +208,9 @@ class Table:
     fact: bool = False
 
 
-def draw_star(path: Path) -> None:
+def draw_star(path: Path, compact: bool = False) -> None:
     svg = SVG()
-    W, LH = 210, 15
+    W, LH = (230, 17) if compact else (210, 15)
     tables = {
         "dim_product": Table("dim_product", 0, 40, ["PK product_key", "product_id", "category_pt", "category_en",
                                                     "macro_category", "weight_g", "volume_cm3", "photos_qty"]),
@@ -233,6 +233,31 @@ def draw_star(path: Path) -> None:
                              "is_late", "approval_hours", "carrier_days", "review_score", "has_review"], fact=True),
         "dim_payment_type": Table("dim_payment_type", 1120, 60, ["PK payment_type_key", "payment_type"]),
     }
+    if compact:
+        keep = {
+            "dim_product": ["PK product_key", "product_id", "category_en", "macro_category", "…"],
+            "dim_seller": ["PK seller_key", "seller_id", "zip_prefix", "city", "state_code", "region_name", "…"],
+            "fact_order_item": ["PK order_id", "PK order_item_id", "FK purchase_date_key", "FK customer_key", "FK seller_key",
+                                "FK product_key", "FK status_key", "price", "freight_value", "freight_ratio", "distance_km"],
+            "dim_date": ["PK date_key", "full_date", "day_of_week", "month", "quarter", "year", "…"],
+            "dim_customer": ["PK customer_key", "customer_unique_id", "zip_prefix", "city", "state_code", "region_name", "…"],
+            "dim_order_status": ["PK status_key", "status"],
+            "fact_order": ["PK order_id", "FK purchase_date_key", "FK delivered_date_key", "FK estimated_date_key",
+                           "FK customer_key", "FK status_key", "FK payment_type_key", "n_items", "total_price", "total_freight",
+                           "delivery_days", "delay_days", "is_late", "review_score", "… (22 columns)"],
+            "dim_payment_type": ["PK payment_type_key", "payment_type"],
+        }
+        for name, cols in keep.items():
+            tables[name].columns = cols
+        tables["dim_product"].y, tables["dim_seller"].y = 60, 420
+        tables["fact_order_item"].y = 200
+        tables["dim_date"].y, tables["dim_customer"].y, tables["dim_order_status"].y = 0, 250, 500
+        tables["fact_order"].y = 150
+        tables["dim_payment_type"].y = 40
+        tables["dim_date"].x = tables["dim_customer"].x = tables["dim_order_status"].x = 580
+        tables["fact_order"].x = 880
+        tables["dim_payment_type"].x = 1180
+        tables["fact_order_item"].x = 290
     for t in tables.values():
         h = 26 + LH * len(t.columns) + 8
         svg.rect(t.x, t.y, W, h, fill="#e9eef7" if t.fact else "#fff")
@@ -240,9 +265,9 @@ def draw_star(path: Path) -> None:
         svg.text(t.x + W / 2, t.y + 17, t.name, weight="bold", size=13)
         for i, c in enumerate(t.columns):
             tag, name = (c.split(" ", 1) if c.startswith(("PK ", "FK ")) else ("", c))
-            svg.text(t.x + 8, t.y + 38 + LH * i, name, anchor="start", size=11, weight="bold" if tag == "PK" else "normal")
+            svg.text(t.x + 8, t.y + 38 + LH * i, name, anchor="start", size=13 if compact else 11, weight="bold" if tag == "PK" else "normal")
             if tag:
-                svg.text(t.x + W - 8, t.y + 38 + LH * i, tag, anchor="end", size=9, italic=True)
+                svg.text(t.x + W - 8, t.y + 38 + LH * i, tag, anchor="end", size=10 if compact else 9, italic=True)
 
     def mid(t: Table, side: str):
         h = 26 + LH * len(t.columns) + 8
@@ -258,7 +283,7 @@ def draw_star(path: Path) -> None:
     for a, sa, b, sb in links:
         (x1, y1), (x2, y2) = mid(tables[a], sa), mid(tables[b], sb)
         svg.line(x1, y1, x2, y2, dashed=(a == "fact_order_item" and b == "fact_order"))
-    svg.text(665, 250, "drill-across on order_id", size=10, italic=True)
+    svg.text(665, 215 if compact else 250, "drill-across on order_id", size=11 if compact else 10, italic=True)
     svg.save(path)
 
 
@@ -266,3 +291,4 @@ if __name__ == "__main__":
     draw_dfm(FACT_ORDER_ITEM, OUT / "dfm_order_item.svg")
     draw_dfm(FACT_ORDER, OUT / "dfm_order.svg")
     draw_star(OUT / "star_schema.svg")
+    draw_star(OUT / "star_schema_compact.svg", compact=True)
