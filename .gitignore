@@ -1,0 +1,12 @@
+# raw data: downloaded with scripts/download_data.sh (Kaggle, CC BY-NC-SA 4.0)
+data/raw/
+# python
+.venv/
+__pycache__/
+*.pyc
+# slide build artefacts
+docs/slides/build/
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
