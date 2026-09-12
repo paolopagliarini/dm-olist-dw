@@ -34,7 +34,7 @@ FILES = {
 
 
 def read_header(path: Path) -> list[str]:
-    with path.open(newline="", encoding="utf-8") as f:
+    with path.open(newline="", encoding="utf-8-sig") as f:  # utf-8-sig strips the BOM
         return next(csv.reader(f))
 
 
