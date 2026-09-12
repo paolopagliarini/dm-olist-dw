@@ -30,14 +30,14 @@ level of each row. Then drill-down into the largest macro-category, split by yea
 
 | macro-category | lines | revenue | share |
 |---|---:|---:|---:|
-| Home & Furniture | 29,005 | 2,821,271 | 21.3 % |
-| Sports & Leisure | 17,022 | 2,233,862 | 16.9 % |
+| Home & Furniture | 29,347 | 2,853,087 | 21.6 % |
+| Sports & Leisure | 16,830 | 2,220,659 | 16.8 % |
 | Electronics & Computers | 16,869 | 1,841,712 | 13.9 % |
 | Health & Beauty | 12,805 | 1,623,276 | 12.3 % |
 | Fashion & Accessories | 9,511 | 1,502,217 | 11.4 % |
-| … 7 more | | | 24.2 % |
+| … 7 more | | | 24.1 % |
 
-**Drill-down (Home & Furniture).** Three categories make 83 % of it: `bed_bath_table` (1.02 M),
+**Drill-down (Home & Furniture).** Three categories make 82 % of it: `bed_bath_table` (1.02 M),
 `furniture_decor` (0.71 M), `housewares` (0.62 M). `housewares` grew most between 2017 and 2018 (+76 %).
 
 **Reading.** Five macro-categories cover three quarters of revenue. The top level is useful because the 73
@@ -149,12 +149,12 @@ one query; `freight_ratio = freight / price` per line.
 
 **Result.**
 - Freight is 17.6 % of revenue overall; 12.7 % under 100 km, 21.6 % over 1000 km.
-- By macro-category: Food & Drink 25.9 % and **Home & Furniture 22.2 %** (31.5 % over 1000 km — bulky items);
+- By macro-category: Food & Drink 25.9 % and **Home & Furniture 22.2 %** (31.6 % over 1000 km — bulky items);
   Fashion 11.2 % and Appliances 10.5 % (high prices).
 - Electronics & Computers has the highest share of lines where **shipping ≥ price: 7.9 %** (cheap accessories).
 
 **Reading.** Shipping cost depends on both what is shipped and how far: the cube shows the two effects
-adding up (Home & Furniture over 1000 km = 31.5 %).
+adding up (Home & Furniture over 1000 km = 31.6 %).
 
 ---
 
@@ -170,7 +170,7 @@ dice by macro-category for the share of the top 3 sellers.
   The top 100 sellers (3.4 %) make 45.5 %.
 - The biggest seller has 1.72 % of revenue (Fashion, Guariba SP); 9 of the top 10 are in São Paulo state.
 - Concentration is highest in Fashion & Accessories (top 3 sellers = 36.5 %) and lowest in Sports & Leisure
-  (12.8 %, 858 sellers).
+  (12.9 %, 839 sellers).
 
 **Reading.** A long tail typical of marketplaces. Nothing here required a special structure: the star schema
 plus window functions answers it directly.
