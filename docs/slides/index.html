@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Olist Data Warehouse — Data Management project</title>
+<style>
+  @page { size: 960pt 540pt; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 15pt; line-height: 1.35; }
+  .slide { width: 960pt; height: 540pt; page-break-after: always; position: relative; padding: 38pt 56pt 40pt 56pt; overflow: hidden; }
+  .slide:last-child { page-break-after: auto; }
+  h1 { font-size: 24pt; font-weight: 700; margin: 0 0 6pt 0; color: #1f4e79; }
+  h1 small { display: block; font-size: 12pt; font-weight: 400; color: #6b7280; margin-top: 2pt; }
+  h2 { font-size: 15pt; font-weight: 700; margin: 12pt 0 4pt 0; }
+  p { margin: 4pt 0; }
+  ul { margin: 4pt 0 4pt 16pt; padding: 0; }
+  li { margin: 2pt 0; }
+  .rule { height: 1.2pt; background: #1f4e79; margin: 4pt 0 12pt 0; }
+  .footer { position: absolute; left: 56pt; right: 56pt; bottom: 16pt; font-size: 9pt; color: #6b7280; display: flex; justify-content: space-between; border-top: 0.6pt solid #d1d5db; padding-top: 5pt; }
+  .cols { display: flex; gap: 22pt; }
+  .col { flex: 1; min-width: 0; }
+  .col-2 { flex: 2; min-width: 0; }
+  table { border-collapse: collapse; font-size: 11pt; width: 100%; }
+  th, td { padding: 2.5pt 6pt; text-align: left; border-bottom: 0.6pt solid #d1d5db; vertical-align: top; }
+  th { font-weight: 700; border-bottom: 1.2pt solid #1f4e79; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .small { font-size: 11pt; }
+  .tiny { font-size: 9.5pt; color: #6b7280; }
+  .muted { color: #6b7280; }
+  .accent { color: #1f4e79; font-weight: 700; }
+  .warn { color: #b23a3a; font-weight: 700; }
+  code, pre { font-family: Menlo, "SF Mono", Consolas, monospace; }
+  code { font-size: 11pt; background: #f3f4f6; padding: 0 3pt; border-radius: 2pt; }
+  pre { font-size: 10pt; background: #f3f4f6; padding: 8pt 10pt; border-radius: 3pt; margin: 6pt 0; line-height: 1.3; }
+  img { max-width: 100%; }
+  .center { text-align: center; }
+  .flow { display: flex; align-items: center; gap: 10pt; margin: 14pt 0; }
+  .box { border: 1.4pt solid #1f4e79; border-radius: 4pt; padding: 8pt 10pt; flex: 1; font-size: 12pt; }
+  .box b { display: block; color: #1f4e79; margin-bottom: 2pt; }
+  .arrow { font-size: 20pt; color: #6b7280; }
+  .kpi { display: flex; gap: 18pt; margin: 8pt 0; }
+  .kpi div { flex: 1; border-left: 3pt solid #1f4e79; padding-left: 10pt; }
+  .kpi .v { font-size: 22pt; font-weight: 700; color: #1f4e79; line-height: 1.1; }
+  .kpi .l { font-size: 10.5pt; color: #6b7280; }
+  .title-slide { padding-top: 150pt; }
+  .title-slide h1 { font-size: 34pt; line-height: 1.15; }
+  .title-slide .sub { font-size: 16pt; color: #374151; margin-top: 10pt; }
+  .title-slide .who { position: absolute; bottom: 60pt; left: 56pt; font-size: 13pt; color: #374151; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide title-slide">
+  <h1>A data warehouse on the Olist<br>Brazilian e-commerce dataset</h1>
+  <p class="sub">ETL in SQL through a reconciled layer · DFM · star schema with two fact tables · OLAP sessions</p>
+  <div class="who">
+    <b>Paolo Pagliarini</b> · 2063987<br>
+    Data Management 2025/2026 — project, Option 2<br>
+    <span class="muted">github.com/paolopagliarini/dm-olist-dw</span>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <h1>The dataset and the sources<small>Olist: a Brazilian marketplace that sells through large e-commerce sites on behalf of small shops</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col-2">
+      <table>
+        <tr><th>Olist file (Kaggle, CC BY-NC-SA 4.0)</th><th class="n">rows</th><th>content</th></tr>
+        <tr><td>orders</td><td class="n">99,441</td><td>status, purchase / approval / carrier / delivery / <b>promised</b> timestamps</td></tr>
+        <tr><td>order_items</td><td class="n">112,650</td><td>one row per line: product, seller, price, freight</td></tr>
+        <tr><td>order_payments</td><td class="n">103,886</td><td>type, instalments, value — several rows per order</td></tr>
+        <tr><td>order_reviews</td><td class="n">99,224</td><td>score 1–5, comment, dates</td></tr>
+        <tr><td>customers</td><td class="n">99,441</td><td>one row per <i>order</i>, zip prefix, city, state</td></tr>
+        <tr><td>sellers</td><td class="n">3,095</td><td>zip prefix, city (free text), state</td></tr>
+        <tr><td>products</td><td class="n">32,951</td><td>category (Portuguese), size, weight, photos</td></tr>
+        <tr><td>geolocation</td><td class="n">1,000,163</td><td>lat / lng samples per zip prefix</td></tr>
+        <tr><td>category translation</td><td class="n">71</td><td>Portuguese → English</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <h2>Period</h2>
+      <p class="small">Sept 2016 – Oct 2018. Only <b>Jan 2017 – Aug 2018</b> is complete: the first four and the last two months are almost empty.</p>
+      <h2>Two sources added</h2>
+      <ul class="small">
+        <li><b>IBGE macro-regions</b>: 27 states → 5 regions (top of the geographic hierarchy)</li>
+        <li><b>Macro-categories</b>: 73 Olist categories → 12 groups, defined by us (top of the product hierarchy)</li>
+      </ul>
+      <h2>Why this dataset</h2>
+      <p class="small">Nine files with shared keys: integrating them is the work. Enough rows for OLAP, small enough to rebuild in seconds.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>2</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <h1>What the raw files look like<small>profiled with DuckDB before writing any ETL — none of these can be solved by "importing the CSV"</small></h1>
+  <div class="rule"></div>
+  <table class="small">
+    <tr><th style="width:36%">problem</th><th style="width:30%">numbers</th><th>what it breaks</th></tr>
+    <tr><td><code>customer_id</code> is generated per order; the person is <code>customer_unique_id</code></td><td>99,441 ids → 96,096 people; 2,997 repeat buyers</td><td>a customer dimension on the wrong key</td></tr>
+    <tr><td><code>review_id</code> is not unique; orders with several reviews; orders without</td><td>789 ids on 2+ orders · 547 orders with 2+ reviews · 768 without</td><td>a review joined on its id duplicates orders</td></tr>
+    <tr><td>several payment rows per order (instalments, voucher + card)</td><td>2,879 orders with 2+ rows; 1 order with none</td><td>payment as a dimension of the order</td></tr>
+    <tr><td>~52 coordinate samples per zip prefix; 42 outside Brazil; 8 prefixes in two states; city spelled 3 ways</td><td>1,000,163 rows → 19,010 prefixes</td><td>geography, distances</td></tr>
+    <tr><td><code>seller_city</code> is free text with junk</td><td><code>sbc/sp</code>, <code>04482255</code>, an e-mail address</td><td>the seller hierarchy</td></tr>
+    <tr><td>products without category; categories without translation</td><td>610 products; 2 categories</td><td>the product hierarchy</td></tr>
+    <tr><td>orders without lines; orders with several sellers</td><td>775 · 1,278</td><td>the grain of "the seller of an order"</td></tr>
+    <tr><td>timestamps as text, some missing; 8 "delivered" orders with no delivery date</td><td>2,965 without delivery date</td><td>delivery measures</td></tr>
+  </table>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>3</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <h1>Architecture: three layers, one PostgreSQL database<small>Python copies the files in; everything else is SQL, in numbered files, rebuilt from scratch by one script</small></h1>
+  <div class="rule"></div>
+  <div class="flow">
+    <div class="box"><b>data/raw</b>9 CSV files, untouched</div><div class="arrow">→</div>
+    <div class="box"><b>staging</b>9 tables, every column TEXT<br><span class="tiny">COPY, one Python script</span></div><div class="arrow">→</div>
+    <div class="box"><b>reconciled</b>12 tables: typed, cleaned, deduplicated, integrated<br><span class="tiny">sql/20–27</span></div><div class="arrow">→</div>
+    <div class="box"><b>dw</b>6 dimensions, 2 facts, 2 materialised views<br><span class="tiny">sql/30–50</span></div><div class="arrow">→</div>
+    <div class="box"><b>OLAP</b>7 sessions<br><span class="tiny">sql/olap/01–07</span></div>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <h2>The reconciled layer</h2>
+      <ul class="small">
+        <li>the integrated, quality-checked view of the operational data from which the warehouse is loaded</li>
+        <li>separates <i>fixing the data</i> (here) from <i>shaping it for analysis</i> (the star schema)</li>
+        <li>every step is a <code>CREATE TABLE … AS SELECT</code> on the previous layer: readable, re-runnable, testable</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h2>One command</h2>
+      <pre>scripts/run_all.sh
+== schemas
+== staging (raw CSV copy)
+== sql/20_reconciled_lookups.sql
+   …
+== sql/60_quality_checks.sql
+NOTICE: quality checks passed: 99441 orders,
+        112650 order lines, 96096 customers …
+== done                              (≈ 10 s)</pre>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>4</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <h1>DFM — fact ORDER ITEM<small>grain: one line of an order · 112,650 instances</small></h1>
+  <div class="rule"></div>
+  <div class="center"><img src="../dfm/dfm_order_item.svg" style="max-height: 300pt; width: 100%;"></div>
+  <div class="cols small" style="margin-top: 6pt">
+    <div class="col"><b>Measures</b>: price, freight value, freight ratio (= freight / price), distance seller → customer in km (haversine on the median coordinates of the two zip prefixes).</div>
+    <div class="col"><b>Dimensions</b>: purchase date, customer, product, seller, order status, order (line number as descriptive attribute). Four hierarchies with 3–5 levels.</div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>5</span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <h1>DFM — fact ORDER<small>grain: one order · 99,441 instances</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col-2"><img src="../dfm/dfm_order.svg" style="max-height: 340pt; width: 100%;"></div>
+    <div class="col small">
+      <h2>Why two facts</h2>
+      <p>Delivery time, delay and review score are properties of the <b>order</b>. On the line fact they would be repeated on every line of a multi-item order (9,803 orders): an average review by category would count an order with three items three times.</p>
+      <p>Each measure lives at the grain where it exists. The two facts share the same <b>conformed dimensions</b> (date, customer, status) and are combined by <b>drill-across</b> on <code>order_id</code>.</p>
+      <h2>Notation</h2>
+      <p>Date is a <b>role-playing</b> dimension (purchase, delivered, promised). Delivered date is an <b>optional</b> arc: 2,965 orders have none.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>6</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <h1>Logical model: star schema<small>surrogate keys, hierarchies denormalised in the dimension tables, foreign keys declared and indexed · compact view, full schema in docs/dfm/star_schema.svg</small></h1>
+  <div class="rule"></div>
+  <div class="center"><img src="../dfm/star_schema_compact.svg" style="max-height: 300pt; width: 100%;"></div>
+  <div class="cols small" style="margin-top: 8pt">
+    <div class="col"><b>Star, not snowflake.</b> One join per dimension, group by the level you need — no chain to reach "region". Dimensions are small (96k, 33k, 3k, 800 rows): repeating "Southeast" costs a few hundred kB. Hierarchies are strict and loaded once: no update anomaly.</div>
+    <div class="col"><b>When a snowflake would pay off:</b> a shared, independently maintained <code>dim_geography</code>, or large dimensions. Neither applies here. <code>order_id</code> is a <b>degenerate dimension</b> in both facts; <code>status_key</code> is replicated on the line fact — a key, not a measure, so no additivity issue.</div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>7</span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <h1>ETL: four of the twelve problems, and their SQL<small>all in the reconciled layer; the full list with numbers is in docs/DESIGN.md §3</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col small">
+      <h2>1 · One review per order</h2>
+      <p>The natural key of a review in this dataset is the order, not <code>review_id</code>. Keep the most recent one.</p>
+      <pre>SELECT DISTINCT ON (order_id)
+       order_id, review_id, review_score::INT …
+FROM staging.order_reviews
+ORDER BY order_id,
+         review_answer_timestamp DESC NULLS LAST,
+         review_creation_date DESC;</pre>
+      <h2>2 · The customer is a person</h2>
+      <p><code>dim_customer</code> is built on <code>customer_unique_id</code>; the address is the one of the most recent order. A map table keeps the per-order key for the facts.</p>
+    </div>
+    <div class="col small">
+      <h2>3 · One point per zip prefix</h2>
+      <p>Bounding box on Brazil, most frequent (state, city) per prefix, <b>median</b> latitude and longitude — then the distance seller → customer for every line:</p>
+      <pre>2 * 6371 * asin(sqrt(
+    sin²(Δlat/2) + cos(lat₁)·cos(lat₂)·sin²(Δlng/2)))</pre>
+      <h2>4 · Hierarchies that do not exist in the files</h2>
+      <p>State → region from IBGE (27 rows). Category → macro-category: 73 → 12, defined by hand (<code>home_confort</code> and <code>home_comfort_2</code> are two Olist categories). Translation file completed; NULL category → <code>unknown</code>, its own macro-category.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>8</span></div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <h1>OLAP 01–02 · Where the revenue comes from<small>roll-up along the product hierarchy (ROLLUP) and the geographic hierarchy (GROUPING SETS) · delivered orders · R$ 13.2 M</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col">
+      <table>
+        <tr><th>macro-category</th><th class="n">revenue</th><th class="n">share</th></tr>
+        <tr><td>Home &amp; Furniture</td><td class="n">2,821,271</td><td class="n">21.3 %</td></tr>
+        <tr><td>Sports &amp; Leisure</td><td class="n">2,233,862</td><td class="n">16.9 %</td></tr>
+        <tr><td>Electronics &amp; Computers</td><td class="n">1,841,712</td><td class="n">13.9 %</td></tr>
+        <tr><td>Health &amp; Beauty</td><td class="n">1,623,276</td><td class="n">12.3 %</td></tr>
+        <tr><td>Fashion &amp; Accessories</td><td class="n">1,502,217</td><td class="n">11.4 %</td></tr>
+        <tr><td class="muted">7 more</td><td class="n muted">1,199,160</td><td class="n muted">24.2 %</td></tr>
+      </table>
+      <p class="small" style="margin-top:8pt"><b>Drill-down</b> into Home &amp; Furniture: three categories (<code>bed_bath_table</code>, <code>furniture_decor</code>, <code>housewares</code>) make 83 % of it; <code>housewares</code> grew +76 % from 2017 to 2018.</p>
+    </div>
+    <div class="col">
+      <table>
+        <tr><th>region</th><th class="n">orders</th><th class="n">share</th><th class="n">R$ / order</th><th class="n">freight / price</th></tr>
+        <tr><td>Southeast</td><td class="n">66,204</td><td class="n">65.4 %</td><td class="n">131</td><td class="n">15.2 %</td></tr>
+        <tr><td>South</td><td class="n">13,813</td><td class="n">14.4 %</td><td class="n">138</td><td class="n">17.7 %</td></tr>
+        <tr><td>Northeast</td><td class="n">9,045</td><td class="n">11.3 %</td><td class="n">166</td><td class="n">21.7 %</td></tr>
+        <tr><td>Central-West</td><td class="n">5,619</td><td class="n">6.4 %</td><td class="n">151</td><td class="n">17.6 %</td></tr>
+        <tr><td>North</td><td class="n">1,797</td><td class="n">2.5 %</td><td class="n">182</td><td class="n">22.7 %</td></tr>
+      </table>
+      <p class="small" style="margin-top:8pt"><b>Drill-down</b>: the state of São Paulo is 38.3 % of the country, the city of São Paulo 36.7 % of the state. The further from the Southeast, the larger the order and the heavier the freight.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>9</span></div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <h1>OLAP 03 · Seasonality<small>slice to the comparable months (Jan–Aug 2017 vs 2018), month × year pivot, drill-down to the day</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col-2"><img src="img/monthly_orders.png" style="width:100%"></div>
+    <div class="col small">
+      <div class="kpi"><div><div class="v">1,176</div><div class="l">orders on Friday 24 Nov 2017 — 2.4× the next busiest day; the four days after it are the next four</div></div></div>
+      <div class="kpi"><div><div class="v">+52 %</div><div class="l">November over October 2017 (LAG window); December −26 %</div></div></div>
+      <div class="kpi"><div><div class="v">6–7k</div><div class="l">orders per month through 2018: the marketplace stopped growing. YoY growth falls from +727 % (Jan) to +51 % (Aug)</div></div></div>
+      <p class="tiny">Sept–Dec 2016 (329 orders) and Sept–Oct 2018 (20) are excluded on purpose; the time dimension carries <code>year_month</code> to make the slice explicit.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>10</span></div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <h1>OLAP 04 · Distance and delivery<small>dice seller region × customer region, then by distance band · drill-across of the two facts on order_id · single-seller delivered orders</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col">
+      <table>
+        <tr><th>distance</th><th class="n">orders</th><th class="n">days</th><th class="n">promised</th><th class="n">late</th><th class="n">review</th></tr>
+        <tr><td>&lt; 100 km</td><td class="n">17,690</td><td class="n">6.5</td><td class="n">15.9</td><td class="n">4.5 %</td><td class="n">4.29</td></tr>
+        <tr><td>100–500 km</td><td class="n">36,461</td><td class="n">11.5</td><td class="n">23.5</td><td class="n">6.2 %</td><td class="n">4.20</td></tr>
+        <tr><td>500–1000 km</td><td class="n">25,392</td><td class="n">14.3</td><td class="n">26.9</td><td class="n">7.2 %</td><td class="n">4.13</td></tr>
+        <tr><td>1000–2000 km</td><td class="n">9,608</td><td class="n">18.0</td><td class="n">30.7</td><td class="n">9.6 %</td><td class="n">4.07</td></tr>
+        <tr><td>&gt; 2000 km</td><td class="n">5,573</td><td class="n">21.2</td><td class="n">33.8</td><td class="n">12.1 %</td><td class="n">3.99</td></tr>
+      </table>
+      <p class="small" style="margin-top:8pt">Distance explains delivery time, late rate and review together, monotonically. This is what <code>distance_km</code> in the reconciled layer is for.</p>
+    </div>
+    <div class="col">
+      <table>
+        <tr><th>seller → customer</th><th class="n">orders</th><th class="n">km</th><th class="n">days</th><th class="n">late</th></tr>
+        <tr><td>Southeast → Southeast</td><td class="n">55,535</td><td class="n">283</td><td class="n">10.4</td><td class="n">6.4 %</td></tr>
+        <tr><td>Southeast → South</td><td class="n">10,357</td><td class="n">708</td><td class="n">14.9</td><td class="n">6.5 %</td></tr>
+        <tr><td>Southeast → Northeast</td><td class="n">7,524</td><td class="n">1,793</td><td class="n">20.1</td><td class="n">13.0 %</td></tr>
+        <tr><td>Southeast → North</td><td class="n">1,492</td><td class="n">2,238</td><td class="n">22.6</td><td class="n">9.1 %</td></tr>
+        <tr><td>South → South</td><td class="n">3,005</td><td class="n">354</td><td class="n">10.6</td><td class="n">3.7 %</td></tr>
+      </table>
+      <p class="small" style="margin-top:8pt">73.9 % of sellers are in the Southeast; <b>5 sellers</b> in the whole North. The promised date is about twice the actual time everywhere: Olist promises conservatively.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>11</span></div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <h1>OLAP 05 · Late delivery and reviews<small>slice to delivered orders with a review; bucket delay = delivered date − promised date; dice by region and by quarter</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col-2"><img src="img/review_by_delay.png" style="width:100%"></div>
+    <div class="col small">
+      <div class="kpi"><div><div class="v">−1.3</div><div class="l">stars between "on the promised day" (4.03) and "up to one week late" (2.71)</div></div></div>
+      <div class="kpi"><div><div class="v">≈ 2.0</div><div class="l">on-time vs late penalty in <i>every</i> region (1.93–2.07), although the late rate goes from 5.8 % (South) to 12.5 % (Northeast)</div></div></div>
+      <div class="kpi"><div><div class="v">2018-Q1</div><div class="l">worst quarter: 12.7 % late, review 3.94 — the backlog after Black Friday and Christmas</div></div></div>
+      <p class="tiny">Being early earns nothing (4.27 vs 4.32). The review follows whether the promise was kept, not the absolute delivery time.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>12</span></div>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <h1>OLAP 06–07 · Freight burden, seller concentration<small>CUBE macro-category × distance band on the line fact · ranking and cumulative share with window functions</small></h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col-2"><img src="img/freight_by_distance.png" style="width:100%"></div>
+    <div class="col small">
+      <p>Freight is <b>17.6 %</b> of revenue overall: 12.7 % under 100 km, 21.6 % over 1000 km. Home &amp; Furniture over 1000 km: <b>31.5 %</b>. Electronics has the most lines where shipping ≥ price (7.9 %: cheap accessories).</p>
+      <div class="kpi" style="margin-top:14pt"><div><div class="v">127</div><div class="l">sellers (4.3 % of 2,970) make 50 % of revenue; 533 (18 %) make 80 %; the top 100 make 45.5 %</div></div></div>
+      <p class="tiny">Concentration is highest in Fashion (top 3 sellers = 36.5 %) and lowest in Sports &amp; Leisure (12.8 %, 858 sellers). The largest seller has 1.72 %.</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>13</span></div>
+</section>
+
+<!-- 14 -->
+<section class="slide">
+  <h1>Quality, performance, reproducibility</h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col small">
+      <h2>Quality checks — run at the end of every build</h2>
+      <ul>
+        <li>row counts of facts and dimensions = sources (nothing lost, nothing duplicated)</li>
+        <li>the two facts agree: Σ <code>total_price</code> = Σ <code>price</code>, same for freight</li>
+        <li><code>n_items</code> per order = number of lines; <code>is_late</code> consistent with <code>delay_days</code></li>
+        <li><code>dim_date</code> has no gaps; every review flag has a score</li>
+      </ul>
+      <p>A failure raises an exception and stops <code>run_all.sh</code>.</p>
+      <h2>Additivity, respected in every query</h2>
+      <p>Money and counts are summed; days, distances, ratios are averaged; the review score is a judgement — average and distribution, never a sum.</p>
+    </div>
+    <div class="col small">
+      <h2>Two materialised views</h2>
+      <table>
+        <tr><th>cube</th><th class="n">rows</th><th class="n">base query</th><th class="n">view</th></tr>
+        <tr><td>month × product hierarchy × state × status</td><td class="n">13,417</td><td class="n">270–1,900 ms</td><td class="n">4 ms</td></tr>
+        <tr><td>seller region × customer region × year</td><td class="n">56</td><td class="n">340 ms</td><td class="n">&lt; 1 ms</td></tr>
+      </table>
+      <p class="tiny">EXPLAIN ANALYZE; the base query scans and sorts the 112,650 lines, the view is read from an index. Physical optimisation only: the OLAP files are written against the star schema.</p>
+      <h2>Reproducible</h2>
+      <pre>uv sync
+scripts/download_data.sh
+scripts/run_all.sh         # ≈ 10 s, ends with the checks
+psql -d olist_dw -f sql/olap/05_late_delivery_vs_review.sql</pre>
+      <p class="tiny">github.com/paolopagliarini/dm-olist-dw — SQL, diagrams, docs/DESIGN.md, docs/OLAP.md</p>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>14</span></div>
+</section>
+
+<!-- 15 -->
+<section class="slide">
+  <h1>Conclusions and limits</h1>
+  <div class="rule"></div>
+  <div class="cols">
+    <div class="col small">
+      <h2>What was built</h2>
+      <ul>
+        <li>nine files + two added sources integrated through a <b>reconciled layer</b> written in SQL, twelve data-quality problems handled explicitly</li>
+        <li><b>DFM</b> with two facts at their own grain and <b>star schema</b> on conformed dimensions, choice motivated against the snowflake</li>
+        <li>four hierarchies with 3–5 levels; role-playing and optional dimensions</li>
+        <li><b>seven OLAP sessions</b> — roll-up, drill-down, slice, dice, pivot, drill-across — each with a finding</li>
+        <li>quality checks, materialised views, one-command rebuild</li>
+      </ul>
+      <h2>The finding worth remembering</h2>
+      <p>Customers do not reward early delivery and punish lateness hard: one week late and the modal review is one star, in every region alike. Distance drives it, and the promised date absorbs most of it.</p>
+    </div>
+    <div class="col small">
+      <h2>Limits</h2>
+      <ul>
+        <li>coordinates are medians per 5-digit zip prefix: distances are approximate (±10–20 km in cities); 555 lines have none</li>
+        <li>revenue = item prices; <code>total_paid</code> from payments differs slightly on a few orders (vouchers, rounding) and is kept apart</li>
+        <li>a sample of two years with partial ends: 20 months are comparable across years</li>
+        <li>the macro-categories are our grouping, not Olist's</li>
+      </ul>
+      <h2>Possible extensions</h2>
+      <ul>
+        <li>a customer-level fact (repeat purchases, lifetime value) — 2,997 repeat buyers is thin</li>
+        <li>slowly changing dimension for sellers if the data covered more years</li>
+        <li>text of the reviews as a further source</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer"><span>Data Management 2025/26 — Olist Data Warehouse</span><span>15</span></div>
+</section>
+
+</body>
+</html>
