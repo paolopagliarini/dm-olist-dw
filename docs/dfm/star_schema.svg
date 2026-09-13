@@ -25,7 +25,7 @@
 <text x="8" y="608" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" fill="#111">region_name</text>
 <text x="8" y="623" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" fill="#111">lat</text>
 <text x="8" y="638" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" fill="#111">lng</text>
-<rect x="280" y="250" width="210" height="199" fill="#e9eef7" stroke="#222" stroke-width="1.6"/>
+<rect x="280" y="250" width="210" height="199" fill="#f4e8ea" stroke="#222" stroke-width="1.6"/>
 <line x1="280" y1="274" x2="490" y2="274" stroke="#222" stroke-width="1.4"/>
 <text x="385" y="267" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="#111">fact_order_item</text>
 <text x="288" y="288" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="start" fill="#111">order_id</text>
@@ -81,7 +81,7 @@
 <text x="568" y="638" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="start" fill="#111">status_key</text>
 <text x="762" y="638" font-family="Helvetica, Arial, sans-serif" font-size="9" font-weight="normal" text-anchor="end" font-style="italic" fill="#111">PK</text>
 <text x="568" y="653" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" fill="#111">status</text>
-<rect x="840" y="200" width="210" height="364" fill="#e9eef7" stroke="#222" stroke-width="1.6"/>
+<rect x="840" y="200" width="210" height="364" fill="#f4e8ea" stroke="#222" stroke-width="1.6"/>
 <line x1="840" y1="224" x2="1050" y2="224" stroke="#222" stroke-width="1.4"/>
 <text x="945" y="217" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" text-anchor="middle" fill="#111">fact_order</text>
 <text x="848" y="238" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="bold" text-anchor="start" fill="#111">order_id</text>

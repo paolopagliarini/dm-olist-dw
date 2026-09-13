@@ -24,7 +24,7 @@ FONT = "Helvetica, Arial, sans-serif"
 R = 7            # radius of a dimension-attribute circle
 STEP = 132       # distance between two levels of a hierarchy (horizontal chains)
 VSTEP = 62       # distance between two levels (vertical chains)
-ROW_GAP = 58     # vertical gap between two hierarchies on the same side
+ROW_GAP = 68     # vertical gap between two hierarchies on the same side
 
 
 # ----------------------------------------------------------------------------
@@ -103,9 +103,9 @@ def draw_dfm(fact: Fact, path: Path) -> None:
     bx, by = 0, 0                      # top-left; everything is relative, the viewBox is fitted at the end
     svg.rect(bx, by, bw, bh, fill="#f3f3f3")
     svg.line(bx, by + 28, bx + bw, by + 28)
-    svg.text(bx + bw / 2, by + 19, fact.name, weight="bold", size=14)
+    svg.text(bx + bw / 2, by + 19, fact.name, weight="bold", size=16)
     for i, m in enumerate(fact.measures):
-        svg.text(bx + 10, by + 46 + 18 * i, m, anchor="start", size=12)
+        svg.text(bx + 10, by + 46 + 18 * i, m, anchor="start", size=14)
 
     cx, cy = bx + bw / 2, by + bh / 2
 
@@ -122,18 +122,19 @@ def draw_dfm(fact: Fact, path: Path) -> None:
                     x = prev[0] + direction * STEP
                     svg.line(prev[0], y, x, y)
                 svg.circle(x, y)
-                svg.text(x, y - 13, level, size=13)
+                # a level with a side branch gets its label below, so the branch does not cross it
+                svg.text(x, y + 25 if h.branches.get(level) else y - 13, level, size=15)
                 for di, d in enumerate(h.descriptive.get(level, [])):
                     # descriptive attribute: short line downwards, label at the end, no circle
                     dy = y + 22 + 16 * di
                     svg.line(x, y + R, x, dy)
-                    svg.text(x + 5, dy + 4, d, anchor="start", size=11, italic=True)
+                    svg.text(x + 5, dy + 4, d, anchor="start", size=13, italic=True)
                 for br in h.branches.get(level, []):
                     # side branch: one extra level drawn diagonally upwards
                     bxx, byy = x + direction * 70, y - 40
                     svg.line(x, y, bxx, byy)
                     svg.circle(bxx, byy)
-                    svg.text(bxx, byy - 13, br, size=12)
+                    svg.text(bxx, byy - 13, br, size=14)
                 prev = (x, y)
         else:
             direction = -1 if h.side == "top" else 1
@@ -147,16 +148,16 @@ def draw_dfm(fact: Fact, path: Path) -> None:
                     y = prev[1] + direction * VSTEP
                     svg.line(x, prev[1], x, y)
                 svg.circle(x, y)
-                svg.text(x + 12, y + 4, level, anchor="start", size=12)
+                svg.text(x + 12, y + 4, level, anchor="start", size=14)
                 for di, d in enumerate(h.descriptive.get(level, [])):
                     dx = x - 22 - 0 * di
                     svg.line(x - R, y, dx, y + 14 * (di + 1))
-                    svg.text(dx - 4, y + 14 * (di + 1) + 4, d, anchor="end", size=11, italic=True)
+                    svg.text(dx - 4, y + 14 * (di + 1) + 4, d, anchor="end", size=13, italic=True)
                 for br in h.branches.get(level, []):
                     bxx, byy = x - 70, y + direction * 40
                     svg.line(x, y, bxx, byy)
                     svg.circle(bxx, byy)
-                    svg.text(bxx - 12, byy + 4, br, anchor="end", size=12)
+                    svg.text(bxx - 12, byy + 4, br, anchor="end", size=14)
                 prev = (x, y)
     svg.save(path)
 
@@ -210,7 +211,7 @@ class Table:
 
 def draw_star(path: Path, compact: bool = False) -> None:
     svg = SVG()
-    W, LH = (230, 17) if compact else (210, 15)
+    W, LH = (240, 19) if compact else (210, 15)
     tables = {
         "dim_product": Table("dim_product", 0, 40, ["PK product_key", "product_id", "category_pt", "category_en",
                                                     "macro_category", "weight_g", "volume_cm3", "photos_qty"]),
@@ -249,25 +250,25 @@ def draw_star(path: Path, compact: bool = False) -> None:
         }
         for name, cols in keep.items():
             tables[name].columns = cols
-        tables["dim_product"].y, tables["dim_seller"].y = 60, 420
-        tables["fact_order_item"].y = 200
-        tables["dim_date"].y, tables["dim_customer"].y, tables["dim_order_status"].y = 0, 250, 500
-        tables["fact_order"].y = 150
-        tables["dim_payment_type"].y = 40
-        tables["dim_date"].x = tables["dim_customer"].x = tables["dim_order_status"].x = 580
-        tables["fact_order"].x = 880
-        tables["dim_payment_type"].x = 1180
-        tables["fact_order_item"].x = 290
+        tables["dim_product"].y, tables["dim_seller"].y = 40, 380
+        tables["fact_order_item"].y = 190
+        tables["dim_date"].y, tables["dim_customer"].y, tables["dim_order_status"].y = 0, 230, 470
+        tables["fact_order"].y = 190
+        tables["dim_payment_type"].y = 40      # above fact_order, keeps the drawing narrow
+        tables["dim_date"].x = tables["dim_customer"].x = tables["dim_order_status"].x = 600
+        tables["fact_order"].x = 900
+        tables["dim_payment_type"].x = 900
+        tables["fact_order_item"].x = 300
     for t in tables.values():
         h = 26 + LH * len(t.columns) + 8
-        svg.rect(t.x, t.y, W, h, fill="#e9eef7" if t.fact else "#fff")
+        svg.rect(t.x, t.y, W, h, fill="#f4e8ea" if t.fact else "#fff")
         svg.line(t.x, t.y + 24, t.x + W, t.y + 24)
-        svg.text(t.x + W / 2, t.y + 17, t.name, weight="bold", size=13)
+        svg.text(t.x + W / 2, t.y + 17, t.name, weight="bold", size=15 if compact else 13)
         for i, c in enumerate(t.columns):
             tag, name = (c.split(" ", 1) if c.startswith(("PK ", "FK ")) else ("", c))
-            svg.text(t.x + 8, t.y + 38 + LH * i, name, anchor="start", size=13 if compact else 11, weight="bold" if tag == "PK" else "normal")
+            svg.text(t.x + 8, t.y + 38 + LH * i, name, anchor="start", size=15 if compact else 11, weight="bold" if tag == "PK" else "normal")
             if tag:
-                svg.text(t.x + W - 8, t.y + 38 + LH * i, tag, anchor="end", size=10 if compact else 9, italic=True)
+                svg.text(t.x + W - 8, t.y + 38 + LH * i, tag, anchor="end", size=12 if compact else 9, italic=True)
 
     def mid(t: Table, side: str):
         h = 26 + LH * len(t.columns) + 8
@@ -280,10 +281,12 @@ def draw_star(path: Path, compact: bool = False) -> None:
              ("fact_order", "l", "dim_date", "r"), ("fact_order", "l", "dim_customer", "r"),
              ("fact_order", "l", "dim_order_status", "r"), ("fact_order", "r", "dim_payment_type", "l"),
              ("fact_order_item", "tr", "fact_order", "tl")]
+    if compact:
+        links[8] = ("fact_order", "t", "dim_payment_type", "b")
     for a, sa, b, sb in links:
         (x1, y1), (x2, y2) = mid(tables[a], sa), mid(tables[b], sb)
         svg.line(x1, y1, x2, y2, dashed=(a == "fact_order_item" and b == "fact_order"))
-    svg.text(665, 215 if compact else 250, "drill-across on order_id", size=11 if compact else 10, italic=True)
+    svg.text(720 if compact else 665, 212 if compact else 250, "drill-across on order_id", size=13 if compact else 10, italic=True)
     svg.save(path)
 
 

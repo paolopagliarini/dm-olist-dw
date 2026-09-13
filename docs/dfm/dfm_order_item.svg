@@ -1,80 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-635 -69 1459 326" width="1459" height="326">
-<rect x="-635" y="-69" width="1459" height="326" fill="#fff"/>
-<rect x="0" y="0" width="190" height="166" fill="#f3f3f3" stroke="#222" stroke-width="1.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-638 -71 1466 348" width="1466" height="348">
+<rect x="-638" y="-71" width="1466" height="348" fill="#fff"/>
+<rect x="0" y="0" width="190" height="186" fill="#f3f3f3" stroke="#222" stroke-width="1.6"/>
 <line x1="0" y1="28" x2="190" y2="28" stroke="#222" stroke-width="1.4"/>
-<text x="95" y="19" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">ORDER ITEM</text>
-<text x="10" y="46" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" text-anchor="start" fill="#111">price</text>
-<text x="10" y="64" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" text-anchor="start" fill="#111">freight value</text>
-<text x="10" y="82" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" text-anchor="start" fill="#111">freight ratio</text>
-<text x="10" y="100" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" text-anchor="start" fill="#111">distance (km)</text>
+<text x="95" y="19" font-family="Helvetica, Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#111">ORDER ITEM</text>
+<text x="10" y="46" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="start" fill="#111">price</text>
+<text x="10" y="64" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="start" fill="#111">freight value</text>
+<text x="10" y="82" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="start" fill="#111">freight ratio</text>
+<text x="10" y="100" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="start" fill="#111">distance (km)</text>
 <line x1="0" y1="20" x2="-60" y2="20" stroke="#222" stroke-width="1.4"/>
 <circle cx="-60" cy="20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-60" y="7" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">purchase date</text>
+<text x="-60" y="45" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">purchase date</text>
 <line x1="-60" y1="20" x2="-130" y2="-20" stroke="#222" stroke-width="1.4"/>
 <circle cx="-130" cy="-20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-130" y="-33" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" text-anchor="middle" fill="#111">day of week</text>
+<text x="-130" y="-33" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="middle" fill="#111">day of week</text>
 <line x1="-60" y1="20" x2="-192" y2="20" stroke="#222" stroke-width="1.4"/>
 <circle cx="-192" cy="20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-192" y="7" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">month</text>
+<text x="-192" y="7" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">month</text>
 <line x1="-192" y1="20" x2="-324" y2="20" stroke="#222" stroke-width="1.4"/>
 <circle cx="-324" cy="20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-324" y="7" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">quarter</text>
+<text x="-324" y="7" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">quarter</text>
 <line x1="-324" y1="20" x2="-456" y2="20" stroke="#222" stroke-width="1.4"/>
 <circle cx="-456" cy="20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-456" y="7" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">year</text>
-<line x1="0" y1="78" x2="-60" y2="78" stroke="#222" stroke-width="1.4"/>
-<circle cx="-60" cy="78" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-60" y="65" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">customer</text>
-<line x1="-60" y1="85" x2="-60" y2="100" stroke="#222" stroke-width="1.4"/>
-<text x="-55" y="104" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">n. orders</text>
-<line x1="-60" y1="78" x2="-192" y2="78" stroke="#222" stroke-width="1.4"/>
-<circle cx="-192" cy="78" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-192" y="65" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">zip prefix</text>
-<line x1="-192" y1="78" x2="-324" y2="78" stroke="#222" stroke-width="1.4"/>
-<circle cx="-324" cy="78" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-324" y="65" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">city</text>
-<line x1="-324" y1="78" x2="-456" y2="78" stroke="#222" stroke-width="1.4"/>
-<circle cx="-456" cy="78" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-456" y="65" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">state</text>
-<line x1="-456" y1="78" x2="-588" y2="78" stroke="#222" stroke-width="1.4"/>
-<circle cx="-588" cy="78" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="-588" y="65" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">region</text>
+<text x="-456" y="7" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">year</text>
+<line x1="0" y1="88" x2="-60" y2="88" stroke="#222" stroke-width="1.4"/>
+<circle cx="-60" cy="88" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="-60" y="75" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">customer</text>
+<line x1="-60" y1="95" x2="-60" y2="110" stroke="#222" stroke-width="1.4"/>
+<text x="-55" y="114" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">n. orders</text>
+<line x1="-60" y1="88" x2="-192" y2="88" stroke="#222" stroke-width="1.4"/>
+<circle cx="-192" cy="88" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="-192" y="75" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">zip prefix</text>
+<line x1="-192" y1="88" x2="-324" y2="88" stroke="#222" stroke-width="1.4"/>
+<circle cx="-324" cy="88" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="-324" y="75" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">city</text>
+<line x1="-324" y1="88" x2="-456" y2="88" stroke="#222" stroke-width="1.4"/>
+<circle cx="-456" cy="88" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="-456" y="75" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">state</text>
+<line x1="-456" y1="88" x2="-588" y2="88" stroke="#222" stroke-width="1.4"/>
+<circle cx="-588" cy="88" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="-588" y="75" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">region</text>
 <line x1="190" y1="20" x2="250" y2="20" stroke="#222" stroke-width="1.4"/>
 <circle cx="250" cy="20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="250" y="7" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">product</text>
+<text x="250" y="7" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">product</text>
 <line x1="250" y1="27" x2="250" y2="42" stroke="#222" stroke-width="1.4"/>
-<text x="255" y="46" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">weight</text>
+<text x="255" y="46" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">weight</text>
 <line x1="250" y1="27" x2="250" y2="58" stroke="#222" stroke-width="1.4"/>
-<text x="255" y="62" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">volume</text>
+<text x="255" y="62" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">volume</text>
 <line x1="250" y1="27" x2="250" y2="74" stroke="#222" stroke-width="1.4"/>
-<text x="255" y="78" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">photos</text>
+<text x="255" y="78" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="start" font-style="italic" fill="#111">photos</text>
 <line x1="250" y1="20" x2="382" y2="20" stroke="#222" stroke-width="1.4"/>
 <circle cx="382" cy="20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="382" y="7" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">category</text>
+<text x="382" y="7" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">category</text>
 <line x1="382" y1="20" x2="514" y2="20" stroke="#222" stroke-width="1.4"/>
 <circle cx="514" cy="20" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="514" y="7" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">macro-category</text>
-<line x1="190" y1="136" x2="250" y2="136" stroke="#222" stroke-width="1.4"/>
-<circle cx="250" cy="136" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="250" y="123" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">seller</text>
-<line x1="250" y1="136" x2="382" y2="136" stroke="#222" stroke-width="1.4"/>
-<circle cx="382" cy="136" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="382" y="123" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">zip prefix</text>
-<line x1="382" y1="136" x2="514" y2="136" stroke="#222" stroke-width="1.4"/>
-<circle cx="514" cy="136" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="514" y="123" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">city</text>
-<line x1="514" y1="136" x2="646" y2="136" stroke="#222" stroke-width="1.4"/>
-<circle cx="646" cy="136" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="646" y="123" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">state</text>
-<line x1="646" y1="136" x2="778" y2="136" stroke="#222" stroke-width="1.4"/>
-<circle cx="778" cy="136" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="778" y="123" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="middle" fill="#111">region</text>
-<line x1="30" y1="166" x2="30" y2="211" stroke="#222" stroke-width="1.4"/>
-<circle cx="30" cy="211" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="42" y="215" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" text-anchor="start" fill="#111">order status</text>
-<line x1="180" y1="166" x2="180" y2="211" stroke="#222" stroke-width="1.4"/>
-<circle cx="180" cy="211" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
-<text x="192" y="215" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" text-anchor="start" fill="#111">order</text>
-<line x1="173" y1="211" x2="158" y2="225" stroke="#222" stroke-width="1.4"/>
-<text x="154" y="229" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" text-anchor="end" font-style="italic" fill="#111">line number</text>
+<text x="514" y="7" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">macro-category</text>
+<line x1="190" y1="156" x2="250" y2="156" stroke="#222" stroke-width="1.4"/>
+<circle cx="250" cy="156" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="250" y="143" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">seller</text>
+<line x1="250" y1="156" x2="382" y2="156" stroke="#222" stroke-width="1.4"/>
+<circle cx="382" cy="156" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="382" y="143" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">zip prefix</text>
+<line x1="382" y1="156" x2="514" y2="156" stroke="#222" stroke-width="1.4"/>
+<circle cx="514" cy="156" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="514" y="143" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">city</text>
+<line x1="514" y1="156" x2="646" y2="156" stroke="#222" stroke-width="1.4"/>
+<circle cx="646" cy="156" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="646" y="143" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">state</text>
+<line x1="646" y1="156" x2="778" y2="156" stroke="#222" stroke-width="1.4"/>
+<circle cx="778" cy="156" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="778" y="143" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="normal" text-anchor="middle" fill="#111">region</text>
+<line x1="30" y1="186" x2="30" y2="231" stroke="#222" stroke-width="1.4"/>
+<circle cx="30" cy="231" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="42" y="235" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="start" fill="#111">order status</text>
+<line x1="180" y1="186" x2="180" y2="231" stroke="#222" stroke-width="1.4"/>
+<circle cx="180" cy="231" r="7" fill="#fff" stroke="#222" stroke-width="1.4"/>
+<text x="192" y="235" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="normal" text-anchor="start" fill="#111">order</text>
+<line x1="173" y1="231" x2="158" y2="245" stroke="#222" stroke-width="1.4"/>
+<text x="154" y="249" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="normal" text-anchor="end" font-style="italic" fill="#111">line number</text>
 </svg>
