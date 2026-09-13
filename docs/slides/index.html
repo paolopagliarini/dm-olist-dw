@@ -215,12 +215,12 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
 <section class="slide">
   <div class="corner"></div><img class="corner-logo" src="img/sapienza-emblem.png" alt="">
   <h2 class="stitle"><span class="req">[DFM]</span> Fact ORDER ITEM</h2>
-  <img class="fig" src="../dfm/dfm_order_item.svg" style="width:1110px" alt="DFM of the fact ORDER ITEM">
+  <img class="fig" src="../dfm/dfm_order_item.svg" style="height:330px" alt="DFM of the fact ORDER ITEM">
   <p class="caption">Grain: one line of an order · 112,650 instances.</p>
   <ul style="margin-top:16px">
-    <li><b>Measures</b>: price, freight value, freight ratio, distance from seller to customer in km</li>
+    <li><b>Measures</b>: price and freight value are summed; freight ratio and distance are only averaged (box on the left)</li>
     <li><b>Dimensions</b>: purchase date, customer, product, seller, order status; <code>order_id</code> is a degenerate dimension</li>
-    <li>Four hierarchies with 3 to 5 levels: date → month → quarter → year · customer and seller → zip → city → state → region · product → category → macro-category</li>
+    <li>Customer and seller share the geographic hierarchy (double circle): zip prefix → city → state → region</li>
   </ul>
   <div class="footer"><b>7</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -229,13 +229,13 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
 <section class="slide">
   <div class="corner"></div><img class="corner-logo" src="img/sapienza-emblem.png" alt="">
   <h2 class="stitle"><span class="req">[DFM]</span> Fact ORDER, and why two facts</h2>
-  <img class="fig" src="../dfm/dfm_order.svg" style="height:318px" alt="DFM of the fact ORDER">
-  <p class="caption">Grain: one order · 99,441 instances. Date plays three roles; the delivered date is optional (2,965 orders have none).</p>
+  <img class="fig" src="../dfm/dfm_order.svg" style="width:1110px" alt="DFM of the fact ORDER">
+  <p class="caption">Grain: one order · 99,441 instances. One date hierarchy shared by three roles (double circle); the dash marks the optional delivered date (2,965 orders have none).</p>
   <ul class="small" style="margin-top:12px">
     <li>Delivery, delay and review belong to the <b>order</b>, and <b>9,803</b> orders have more than one line</li>
     <li>Order A has 3 lines and review 1, order B one line and review 5: per order (1+5)/2 = <b class="n">3</b>; copied on the lines (1+1+1+5)/4 = <b class="n">2</b></li>
     <li>On the data: average review <b>4.09</b> at order grain, 4.03 at line grain (single-line orders 4.16, orders with 3+ lines 3.43)</li>
-    <li>The two facts share <b>conformed dimensions</b> (date, customer, status) and are combined by <b>drill-across</b> on <code>order_id</code>. The proposal had a single fact at line grain; I split it while modelling for this reason</li>
+    <li>The two facts share <b>conformed dimensions</b> (date, customer, status) and are combined by <b>drill-across</b> on <code>order_id</code>.</li>
   </ul>
   <div class="footer"><b>8</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -245,7 +245,7 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
   <div class="corner"></div><img class="corner-logo" src="img/sapienza-emblem.png" alt="">
   <h2 class="stitle"><span class="req">[STAR]</span> Logical model: star schema</h2>
   <img class="fig" src="../dfm/star_schema_compact.svg" style="height:425px" alt="Star schema">
-  <p class="caption">Compact view; the full schema with every attribute is in docs/dfm/star_schema.svg. Surrogate keys, foreign keys declared and indexed.</p>
+  <p class="caption">Generated from the PostgreSQL catalog: one line per foreign key, crow's foot on the many side. Compact view; every column is in docs/dfm/star_schema.svg.</p>
   <ul class="small" style="margin-top:10px">
     <li><b>Star rather than snowflake</b>: one join per dimension, all levels in one table. The dimensions are small (96k, 33k, 3k and 800 rows) and loaded once, so repeating the upper levels costs little</li>
     <li>A snowflake would make sense with large dimensions, or with a separate geography table shared by customers and sellers</li>
