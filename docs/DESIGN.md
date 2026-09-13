@@ -111,6 +111,10 @@ rejected: it is harder to query correctly and the mistake is invisible in the re
 
 Date is a **role-playing dimension**: the same `dim_date` table is referenced three times by `fact_order`
 (purchase, delivered, estimated). The delivered date is an **optional** arc (NULL when the order is not delivered).
+In the DFM the date hierarchy is drawn once, from a double circle (shared hierarchy) reached by three arcs
+labelled with their roles; the dash across the delivered arc marks it as optional. In ORDER ITEM, customer
+and seller share the geographic hierarchy from the zip prefix up. Next to each fact, a box lists the
+non-additive measures with the operators they allow (AVG, MIN, MAX); all the other measures are summed.
 
 ## 5. Logical model: star schema
 
@@ -151,7 +155,7 @@ line-level query slice on "delivered orders" without a drill-across.
 | freight_ratio, distance_km, delivery_days, delay_days, estimated_days, approval_hours, carrier_days | none (use averages) | a sum of days over orders has no meaning; average or distribution |
 | review_score | none | a judgement: average, share of 1-star / 5-star |
 | is_late, has_review | counted | `avg(is_late::int)` = late rate |
-| n_installments | none | max per order; average across orders |
+| n_sellers, n_installments | none | counts per order; average, min, max across orders |
 
 The OLAP files respect this: sums for money and counts, averages and shares for everything else.
 
