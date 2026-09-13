@@ -106,6 +106,7 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
     <div class="subtitle">Data Management 2025/26 · Project Discussion (Option 2)</div>
     <div class="meta">Paolo Pagliarini · 2063987</div>
     <div class="meta" style="margin-top:6px">September 2026 · Sapienza University of Rome</div>
+    <div class="meta" style="margin-top:6px">github.com/paolopagliarini/dm-olist-dw</div>
   </div>
   <img class="corner-word" src="img/sapienza-word.png" alt="Sapienza Università di Roma">
 </section>
@@ -129,7 +130,6 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
       <li><span class="req">[DEMO]</span> Five-minute live demo on the running warehouse</li>
     </ul>
   </div>
-  <ul style="margin-top:8px"><li class="muted">Individual project · code, diagrams and design notes: github.com/paolopagliarini/dm-olist-dw</li></ul>
   <div class="footer"><b>2</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
 
@@ -141,8 +141,8 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
     <li><b>Task</b>: integrate the nine files of the Olist marketplace into one source for the analysis of sales, delivery performance, reviews and freight costs</li>
     <li><b>Data</b>: Olist Brazilian E-Commerce (Kaggle): <b>99,441</b> orders, <b>112,650</b> order lines, 3,095 sellers, Sept 2016 to Oct 2018. Only Jan 2017 to Aug 2018 is complete</li>
     <li><b>Two sources added</b>: the IBGE macro-regions (27 states → 5 regions) and 12 macro-categories defined by us over the 73 Olist categories. They are the top levels of the geographic and product hierarchies</li>
-    <li><b>Stack</b>: PostgreSQL 14; every transformation is SQL. Python only copies the CSV files into the database and draws the charts</li>
-    <li><b>Reproducible</b>: one command rebuilds everything from the raw files and ends with the quality checks, in about 10 seconds</li>
+    <li><b>Stack</b>: PostgreSQL 14 and plain SQL for every transformation. Python is used only to copy the CSV files into the database and to draw the charts</li>
+    <li><b>Reproducible</b>: a single script rebuilds everything from the raw files in about 10 seconds and runs the quality checks at the end</li>
   </ul>
   <div class="footer"><b>3</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -165,7 +165,7 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
   </table>
   <p class="caption">Profiled with DuckDB before writing the ETL. Twelve problems in total, each handled in a named SQL file (docs/DESIGN.md §3).</p>
   <ul style="margin-top:14px">
-    <li>None of them is solved by importing the CSV files as they are: the semantics of each key has to be understood first</li>
+    <li>Importing the CSV files as they are would fix none of these. I first had to understand what each key actually identifies</li>
   </ul>
   <div class="footer"><b>4</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -182,10 +182,10 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
     <div class="box"><b>OLAP</b>7 sessions<br><span>sql/olap/01–07</span></div>
   </div>
   <ul>
-    <li><b>Staging</b> copies without interpreting anything: a malformed value surfaces in SQL, where the decision is visible</li>
-    <li><b>Reconciled</b> is the integrated view of the operational data: one row per real entity, plus the measures the files do not have (delivery days, delay, distance)</li>
-    <li>It separates <b>fixing the data</b> from <b>shaping it for analysis</b>: the star schema is loaded only from here</li>
-    <li>Every step is a <code>CREATE TABLE … AS SELECT</code> on the previous layer: readable, re-runnable, checked at the end</li>
+    <li><b>Staging</b> is a plain copy with every column as text, so a malformed value shows up later in SQL, where I decide what to do with it</li>
+    <li><b>Reconciled</b> holds the cleaned and integrated data, with one row per real entity and the measures that the files do not contain (delivery days, delay, distance)</li>
+    <li>The star schema is loaded only from the reconciled layer, so cleaning the data and modelling it for analysis stay in separate files</li>
+    <li>Each step is a <code>CREATE TABLE … AS SELECT</code> on the previous layer, and each file can be read and re-run on its own</li>
   </ul>
   <div class="footer"><b>5</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -197,13 +197,13 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
   <div class="cols">
     <div>
       <div class="block"><h3>One review per order</h3>
-        <p>The key of a review is the order, not <code>review_id</code>. The most recent one is kept: <code>DISTINCT ON (order_id)</code> ordered by answer time. Averaging two judgements would not give a meaningful score.</p></div>
+        <p>The key of a review is the order, not <code>review_id</code>. The most recent one is kept: <code>DISTINCT ON (order_id)</code> ordered by answer time. The average of two different scores would be a score nobody gave.</p></div>
       <div class="block"><h3>The customer is a person</h3>
         <p><code>dim_customer</code> is built on <code>customer_unique_id</code> (96,096 people), with the address of the most recent order. A map table keeps the per-order id for loading the facts.</p></div>
     </div>
     <div>
       <div class="block"><h3>One point per zip prefix</h3>
-        <p>Samples outside Brazil dropped, most frequent state and city, <b>median</b> latitude and longitude, robust to wrong samples. The seller → customer distance is the haversine between the two points.</p></div>
+        <p>Samples outside Brazil dropped, most frequent state and city, <b>median</b> latitude and longitude, so a few wrong samples do not move the point. The seller → customer distance is the haversine between the two points.</p></div>
       <div class="block"><h3>Hierarchies that are not in the files</h3>
         <p>State → region from IBGE (27 rows). Category → macro-category, 73 → 12, defined by hand. Translation file completed; products without category go to <code>unknown</code>.</p></div>
     </div>
@@ -235,7 +235,7 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
     <li>Delivery, delay and review belong to the <b>order</b>, and <b>9,803</b> orders have more than one line</li>
     <li>Order A has 3 lines and review 1, order B one line and review 5: per order (1+5)/2 = <b class="n">3</b>; copied on the lines (1+1+1+5)/4 = <b class="n">2</b></li>
     <li>On the data: average review <b>4.09</b> at order grain, 4.03 at line grain (single-line orders 4.16, orders with 3+ lines 3.43)</li>
-    <li>The two facts share <b>conformed dimensions</b> (date, customer, status) and are combined by <b>drill-across</b> on <code>order_id</code></li>
+    <li>The two facts share <b>conformed dimensions</b> (date, customer, status) and are combined by <b>drill-across</b> on <code>order_id</code>. The proposal had a single fact at line grain; I split it while modelling for this reason</li>
   </ul>
   <div class="footer"><b>8</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -247,8 +247,8 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
   <img class="fig" src="../dfm/star_schema_compact.svg" style="height:425px" alt="Star schema">
   <p class="caption">Compact view; the full schema with every attribute is in docs/dfm/star_schema.svg. Surrogate keys, foreign keys declared and indexed.</p>
   <ul class="small" style="margin-top:10px">
-    <li><b>Star, not snowflake</b>: one join per dimension, hierarchies denormalised. The dimensions are small (96k, 33k, 3k, 800 rows) and the hierarchies strict and loaded once: the redundancy is cheap and causes no update anomaly</li>
-    <li>A snowflake would pay off with a geography table shared and maintained on its own, or with large dimensions</li>
+    <li><b>Star rather than snowflake</b>: one join per dimension, all levels in one table. The dimensions are small (96k, 33k, 3k and 800 rows) and loaded once, so repeating the upper levels costs little</li>
+    <li>A snowflake would make sense with large dimensions, or with a separate geography table shared by customers and sellers</li>
   </ul>
   <div class="footer"><b>9</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -288,7 +288,7 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
   <ul class="small" style="margin-top:14px">
     <li><b>Drill-down</b> into Home &amp; Furniture: three categories make 82 % of it; <code>housewares</code> grows +76 % from 2017 to 2018</li>
     <li><b>Drill-down</b> on geography: the state of São Paulo is 38.3 % of the country, its capital 36.7 % of the state</li>
-    <li>The further from the Southeast, the larger the order and the heavier the freight</li>
+    <li>Orders from regions far from the Southeast are larger on average and pay a higher share of freight</li>
   </ul>
   <div class="footer"><b>10</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -323,7 +323,7 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
   </table>
   <p class="caption">Delivered single-seller orders. Distance from the line fact, delivery from the order fact: drill-across on order_id.</p>
   <ul class="small" style="margin-top:14px">
-    <li>Distance moves delivery time, late rate and review together, monotonically: this is what <code>distance_km</code> in the reconciled layer is for</li>
+    <li>Delivery time, late rate and review all get worse from one distance band to the next. This is why I computed <code>distance_km</code> in the reconciled layer</li>
     <li><b>Dice</b> seller region × customer region: Southeast → Southeast 10.4 days, 6.4 % late; Southeast → Northeast 20.1 days, 13 % late</li>
     <li>73.9 % of the sellers are in the Southeast, 5 in the whole North; the promised date is about twice the actual time everywhere</li>
   </ul>
@@ -337,9 +337,9 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
   <img class="fig" src="img/review_by_delay.png" style="height:292px" alt="Average review by delay band">
   <p class="caption">Delivered orders with a review; delay = delivered date − promised date, then dice by region and by quarter.</p>
   <ul class="small" style="margin-top:12px">
-    <li>From "on the promised day" (4.03) to "up to one week late" (2.71): <b class="n">−1.3</b> stars. Delivering early earns nothing</li>
+    <li>From "on the promised day" (4.03) to "up to one week late" (2.71) the average drops by <b class="n">1.3</b> stars, while arriving two weeks early instead of a few days early changes almost nothing (4.32 vs 4.27)</li>
     <li>The on-time vs late penalty is about <b>2 stars in every region</b> (1.93–2.07), while the late rate goes from 5.8 % (South) to 12.5 % (Northeast)</li>
-    <li>Worst quarter 2018-Q1: 12.7 % late, average review 3.94, the backlog after Black Friday and Christmas</li>
+    <li>The worst quarter is 2018-Q1, right after Black Friday and Christmas: 12.7 % late, average review 3.94</li>
   </ul>
   <div class="footer"><b>13</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
@@ -379,7 +379,7 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
       </table>
       <ul class="small" style="margin-top:16px">
         <li>Revenue by macro-category for one month: <b>110 ms</b> on the line fact, <b>under 1 ms</b> on the view</li>
-        <li>A physical optimisation only: the OLAP sessions are written against the star schema</li>
+        <li>The views only speed things up; the OLAP sessions are still written against the star schema</li>
       </ul>
     </div>
   </div>
@@ -395,23 +395,12 @@ table.sm th, table.sm td { font-size: 17px; padding: 5px 12px; }
     <li><span class="req">[DFM]</span> Two facts, each at the grain where its measures exist, on conformed dimensions</li>
     <li><span class="req">[STAR]</span> Star schema with one join per dimension; the choice is motivated against the snowflake</li>
     <li><span class="req">[OLAP]</span> Seven sessions (roll-up, drill-down, slice, dice, pivot, drill-across), each with a finding</li>
-    <li><b>The finding</b>: customers do not reward early delivery but punish lateness hard, in every region alike; distance drives the delay</li>
+    <li><b>Main result</b>: reviews barely change for early deliveries and drop by about two stars for late ones, in every region; late deliveries become more frequent as the distance grows</li>
     <li class="muted">Limits: distances are approximate (median point of a 5-digit zip prefix); two years with incomplete ends; the macro-categories are our grouping</li>
   </ul>
   <div class="footer"><b>16</b> Data Management 2025/26 · Paolo Pagliarini</div>
 </section>
 
-<!-- 17 · THANK YOU -->
-<section class="slide titleslide">
-  <div class="corner"></div><img class="corner-logo" src="img/sapienza-emblem.png" alt="">
-  <div class="twrap" style="top:250px">
-    <h1>Thank you</h1>
-    <div class="trule" style="width:560px"></div>
-    <div class="subtitle">Next: five-minute live demo</div>
-    <div class="meta">Paolo Pagliarini · Data Management 2025/26 · github.com/paolopagliarini/dm-olist-dw</div>
-  </div>
-  <img class="corner-word" src="img/sapienza-word.png" alt="Sapienza Università di Roma">
-</section>
 
 </body>
 </html>
