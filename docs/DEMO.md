@@ -23,7 +23,7 @@ export PATH="/opt/homebrew/opt/postgresql@14/bin:$PATH"
 * Postgres not running: `brew services start postgresql@14`, wait 3 s.
 * `run_all.sh` fails: skip it, the database from before the call is still there (the script drops schemas only after starting; if it failed in `00_schemas.sql`, run `scripts/run_all.sh` again).
 * A query prints too much: `\pset pager off` was set; use `q` to leave the pager if it appears.
-* No terminal at all: slides 9–13 contain the same tables and charts; say so and go on.
+* No terminal at all: slides 10–14 contain the same tables and charts; say so and go on.
 
 ## Before the call
 
