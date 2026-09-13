@@ -1,6 +1,7 @@
 -- psql settings for the demo:  psql -d olist_dw  then  \i demo/psqlrc
 \pset border 2
 \pset null '∅'
+\pset pager off
 \set QUIET 1
 \set PROMPT1 'olist_dw> '
 \set QUIET 0
