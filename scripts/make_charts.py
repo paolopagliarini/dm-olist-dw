@@ -14,9 +14,10 @@ import psycopg
 
 OUT = Path(__file__).resolve().parent.parent / "docs" / "slides" / "img"
 OUT.mkdir(parents=True, exist_ok=True)
-ACCENT, GREY, RED = "#1f4e79", "#9aa5b1", "#b23a3a"
+# palette of the slides: grey for the bars, Sapienza burgundy for what the chart is about
+BASE, GREY, HIGHLIGHT = "#6b6b6b", "#bdbdbd", "#822433"
 
-plt.rcParams.update({"font.family": "Helvetica", "font.size": 11, "axes.spines.top": False,
+plt.rcParams.update({"font.family": "PT Serif", "font.size": 11, "axes.spines.top": False,
                      "axes.spines.right": False, "axes.grid": True, "grid.alpha": 0.25, "axes.grid.axis": "y"})
 
 
@@ -34,14 +35,14 @@ def monthly_orders(cur):
         GROUP BY 1 ORDER BY 1""")
     labels = [r[0] for r in data]
     values = [r[1] for r in data]
-    colors = [RED if l == "2017-11" else ACCENT for l in labels]
+    colors = [HIGHLIGHT if l == "2017-11" else BASE for l in labels]
     fig, ax = plt.subplots(figsize=(8, 3.6), dpi=200)
     ax.bar(labels, values, color=colors, width=0.75)
     ax.set_ylabel("delivered orders per month")
     ax.set_xticks(range(len(labels)))
     ax.set_xticklabels([l if l.endswith(("-01", "-04", "-07", "-10")) else "" for l in labels])
     ax.annotate("Nov 2017: Black Friday", xy=(labels.index("2017-11"), 7289), xytext=(labels.index("2017-11") - 6.5, 7500),
-                arrowprops=dict(arrowstyle="->", color=RED), color=RED, fontsize=10)
+                arrowprops=dict(arrowstyle="->", color=HIGHLIGHT), color=HIGHLIGHT, fontsize=10)
     fig.tight_layout()
     fig.savefig(OUT / "monthly_orders.png")
 
@@ -59,7 +60,7 @@ def review_by_delay(cur):
     avg = [float(r[2]) for r in data]
     one_star = [float(r[3]) for r in data]
     fig, ax = plt.subplots(figsize=(8, 3.6), dpi=200)
-    bars = ax.bar(labels, avg, color=[ACCENT if a >= 4 else RED for a in avg], width=0.65)
+    bars = ax.bar(labels, avg, color=[BASE if a >= 4 else HIGHLIGHT for a in avg], width=0.65)
     for b, a, o in zip(bars, avg, one_star):
         ax.text(b.get_x() + b.get_width() / 2, a + 0.08, f"{a:.2f}", ha="center", fontsize=10)
         ax.text(b.get_x() + b.get_width() / 2, 0.25, f"{o:.0f}% one-star", ha="center", fontsize=9, color="white")
@@ -85,7 +86,7 @@ def freight_by_distance(cur):
     series = {c: [next(float(r[3]) for r in data if r[0] == c and r[1] == b) for b in bands] for c in cats}
     fig, ax = plt.subplots(figsize=(8, 3.6), dpi=200)
     w = 0.2
-    palette = [ACCENT, "#4f81bd", GREY, "#c9d3dd"]
+    palette = [HIGHLIGHT, "#c07a85", BASE, GREY]
     for i, c in enumerate(cats):
         ax.bar([x + (i - 1.5) * w for x in range(len(bands))], series[c], width=w, label=c, color=palette[i])
     ax.set_xticks(range(len(bands)))
