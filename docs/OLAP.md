@@ -132,11 +132,12 @@ dice by customer region; then by quarter.
 
 - The penalty is the same everywhere: on-time vs late ≈ **2.0 stars** in every region (1.93–2.07), even
   though the late rate differs (5.8 % South, 12.5 % Northeast).
-- By quarter: 2018-Q1 is the worst quarter (12.7 % late, review 3.94) — the backlog after Black Friday and
+- By quarter: 2018-Q1 is the worst quarter (12.7 % late, review 3.94), right after Black Friday and
   Christmas; by 2018-Q3 delivery is at 8.2 days and the review at 4.31.
 
-**Reading.** Being early earns nothing (4.27 vs 4.32); being one day late costs 1.3 stars; one week late and
-the modal review is one star. The review is driven by the promise being kept, not by the absolute delivery time.
+**Reading.** Arriving two weeks early instead of a few days early barely changes the review (4.32 vs 4.27).
+Up to one week late the average drops by 1.3 stars (4.03 → 2.71), and from one to two weeks late 71 % of the
+reviews are one star. The review follows whether the promised date was kept, more than the delivery time itself.
 
 ---
 

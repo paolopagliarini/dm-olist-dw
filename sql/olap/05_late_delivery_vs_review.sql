@@ -1,7 +1,7 @@
 -- OLAP session 05 — Late deliveries and customer reviews
 -- Question : does a late delivery change what customers think? By how much, and is it the same everywhere?
--- Operations: SLICE (delivered orders with a review), bucketing of delay_days, DICE by customer region, then by year
--- Facts     : fact_order (delay_days, is_late, review_score)      Dimensions: dim_customer (region), dim_date (year)
+-- Operations: SLICE (delivered orders with a review), bucketing of delay_days, DICE by customer region, then by quarter
+-- Facts     : fact_order (delay_days, is_late, review_score)      Dimensions: dim_customer (region), dim_date (quarter)
 
 -- Step 1: average review by delay band. delay_days = delivered date - promised date.
 SELECT CASE WHEN o.delay_days <= -14 THEN '1. 2+ weeks early'
