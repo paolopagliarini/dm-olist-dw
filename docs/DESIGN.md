@@ -49,7 +49,7 @@ that solves it.
 | # | problem in the source | numbers | solution | file |
 |---|---|---|---|---|
 | 1 | `customer_id` is generated per order; the person is `customer_unique_id` | 99,441 ids → 96,096 people; 2,997 repeat buyers | customer entity built on the person; address = most recent order; `customer_order_map` keeps the per-order key | `22` |
-| 2 | `review_id` is not unique and orders have several reviews | 789 review ids on 2+ orders; 547 orders with 2+ reviews | the natural key of a review is the order: keep the most recent review per order | `27` |
+| 2 | `review_id` is not unique and orders have several reviews | 789 review ids on 2+ orders; 547 orders with 2+ reviews, 202 of them with different scores | the natural key of a review is the order: keep the most recent review per order | `27` |
 | 3 | several payment rows per order (instalments, vouchers + card) | 2,879 orders with 2+ rows | aggregate per order: main type = highest value, `n_installments` = max, `total_paid` = sum | `26` |
 | 4 | ~52 coordinate samples per zip prefix; 42 points outside Brazil; 8 prefixes under two states; city spelled in 3+ ways | 1,000,163 rows → 19,010 prefixes | bounding box, most frequent (state, city) per prefix, median lat/lng, `unaccent(lower(trim()))` | `21` |
 | 5 | `seller_city` is free text with junk (`sbc/sp`, `04482255`, an e-mail address) | 3,095 sellers | city taken from the geolocation of the seller's zip prefix; cleaned text as fallback | `22` |
@@ -81,7 +81,7 @@ Two facts, drawn in `docs/dfm/dfm_order_item.svg` and `docs/dfm/dfm_order.svg`.
 
 ![DFM order](dfm/dfm_order.svg)
 
-* **Measures**: n. items, n. sellers, total price, total freight, total paid, n. installments, delivery days,
+* **Measures**: n. items, n. sellers, total price, total freight, total paid, n. payments, n. installments, delivery days,
   estimated days, delay days, approval hours, carrier days, review score (+ the flags is late, has review).
 * **Dimensions**: purchase date, delivered date (optional: not every order is delivered), estimated date,
   customer, order status, payment type, order.
@@ -119,6 +119,10 @@ non-additive measures with the operators they allow (AVG, MIN, MAX); all the oth
 ## 5. Logical model: star schema
 
 ![star schema](dfm/star_schema.svg)
+
+The diagram is generated from the database catalog (`information_schema`, `pg_constraint`) by
+`docs/dfm/draw_diagrams.py`: tables, columns, keys and row counts are read from the warehouse, with one line
+per foreign key and the crow's foot on the many side. Only the position of the tables is fixed by hand.
 
 Six dimension tables and two fact tables (`sql/30_dw_dimensions.sql`, `sql/40_dw_facts.sql`). Every
 dimension has a surrogate integer key (`SERIAL`) and keeps the natural key of the source (`customer_unique_id`,
@@ -163,11 +167,12 @@ The OLAP files respect this: sums for money and counts, averages and shares for 
 
 `sql/50_dw_materialized_views.sql` pre-aggregates the two most used cubes. They are a physical optimisation
 and change nothing in the model; measured with `EXPLAIN ANALYZE`, the monthly sales cube goes from ~270–1,900 ms
-on the fact table to ~4 ms on the view (see `docs/OLAP.md`).
+on the fact table to ~4 ms on the view (see `docs/OLAP.md`). On a single month, as in the live demo
+(`demo/02_explain_mv.sql`), the same question takes about 110 ms on the fact table and under 1 ms on the view.
 
 `sql/60_quality_checks.sql` runs at the end of every rebuild and stops it if: a row count differs from the
 source, the two facts disagree on total price or freight, `n_items` does not match the number of lines,
-`is_late` contradicts `delay_days`, or `dim_date` has gaps.
+`is_late` contradicts `delay_days`, an order flagged `has_review` has no score, or `dim_date` has gaps.
 
 ## 8. Limits
 
