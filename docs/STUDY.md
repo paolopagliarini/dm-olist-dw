@@ -63,11 +63,12 @@ SELECT is_late, count(*) FROM reconciled.orders WHERE status = 'delivered' GROUP
 
 **File**: `sql/30_dw_dimensions.sql`, `sql/40_dw_facts.sql`, `sql/60_quality_checks.sql`, `docs/dfm/*.svg`, `docs/DESIGN.md` §4–6.
 
-**Concetti del corso**: DFM (*fact, measures, dimensions, dimensional attributes, hierarchies, descriptive attributes, optional arcs*), grana (*grain / granularity*), schema a stella vs a fiocco di neve (*star vs snowflake*), chiavi surrogate (*surrogate keys*), dimensione degenere (*degenerate dimension*), dimensione con più ruoli (*role-playing dimension*), additività (*additive, semi-additive, non-additive measures*), costellazione di fatti (*fact constellation*) e *drill-across*.
+**Concetti del corso**: DFM (*fact, measures, dimensions, dimensional attributes, hierarchies, descriptive attributes, optional arcs, shared hierarchies*), grana (*grain / granularity*), schema a stella vs a fiocco di neve (*star vs snowflake*), chiavi surrogate (*surrogate keys*), dimensione degenere (*degenerate dimension*), dimensione con più ruoli (*role-playing dimension*), additività (*additive, semi-additive, non-additive measures*), costellazione di fatti (*fact constellation*) e *drill-across*.
 
 **Cosa capire**
 - Le sei dimensioni e le loro gerarchie: date (giorno → mese → trimestre → anno, più giorno della settimana), customer e seller (CEP → città → stato → regione), product (prodotto → categoria → macro-categoria), status e payment type (un solo livello).
 - `dim_date` generata con `generate_series`: da min(purchase) a max(estimated/delivered), 800 giorni. Chiave `yyyymmdd` leggibile. Usata **tre volte** da `fact_order` (acquisto, consegna, promessa): dimensione con più ruoli.
+- Nel DFM la data di ORDER è una **gerarchia condivisa**: cerchio doppio e tre archi con il nome del ruolo (purchase, delivered, estimated); il trattino sull'arco *delivered* vuol dire opzionale. In ORDER ITEM cliente e venditore condividono la geografia dal CEP in su. Il riquadro accanto a ogni fatto elenca le misure non additive con gli operatori ammessi (AVG, MIN, MAX).
 - Perché **due fatti**: `fact_order_item` (riga: price, freight, distanza) e `fact_order` (ordine: consegna, pagamento, review). Copiare `review_score` sulle righe conta tre volte un ordine da tre pezzi in una media per categoria. È la risposta a "modellazione accurata" della FAQ Q10.
 - `status_key` anche in `fact_order_item`: è una chiave, non una misura → nessun problema di additività, e permette lo slice "solo ordini consegnati" senza join fra i fatti.
 - Perché **stella**: dimensioni piccole, gerarchie strette (ogni città in uno stato), caricamento una tantum → la ridondanza non costa e non crea anomalie; le query fanno un join per dimensione. Snowflake avrebbe senso con una `dim_geography` condivisa e mantenuta a parte, o con dimensioni grandi. Delfino chiede di **motivare**, non di scegliere snowflake.
@@ -97,7 +98,7 @@ SELECT * FROM dw.dim_date WHERE full_date = '2017-11-24';
 6. **CUBE** (macro, fascia di distanza): tutti i marginali in una query; `COALESCE(..., 'ALL')` per etichettare i totali.
 7. **Window functions**: `rank()`, `sum() OVER (ORDER BY …)` per la quota cumulata; `FILTER` per "quanti seller per il 50 %".
 
-**Viste materializzate**: cosa sono (risultato salvato di una query, con `REFRESH`), perché sono ottimizzazione fisica e non modello, i numeri misurati (270–1.900 ms → 4 ms). Le OLAP sono scritte sui fatti, non sulle viste, per tracciabilità.
+**Viste materializzate**: cosa sono (risultato salvato di una query, con `REFRESH`), perché sono ottimizzazione fisica e non modello, i numeri misurati (270–1.900 ms → 4 ms con `EXPLAIN ANALYZE` sul cubo mensile; nella demo, un mese solo: circa 110 ms → meno di 1 ms). Le OLAP sono scritte sui fatti, non sulle viste, per tracciabilità.
 
 **Prove da fare**: eseguire ogni file con `\i`, poi cambiare una cosa (un anno, una regione, un livello) e rieseguire.
 
@@ -121,7 +122,7 @@ SELECT * FROM dw.dim_date WHERE full_date = '2017-11-24';
 3. **Cos'è il livello riconciliato e perché lo avete fatto?** La vista integrata e pulita dell'operazionale da cui si carica il DW. Separa "aggiustare i dati" da "dargli forma per l'analisi"; ogni passo è SQL leggibile e rieseguibile; la FAQ dice che alza il voto.
 4. **Stella o fiocco di neve, e perché?** Stella: dimensioni piccole, gerarchie strette caricate una volta, query con un join per dimensione. Snowflake se la geografia fosse una dimensione condivisa mantenuta a parte o se le dimensioni fossero grandi.
 5. **Quali misure sono additive?** Prezzi, freight, totali, n. item: additive. Giorni, distanze, rapporti: solo come media. `review_score`: non additiva, un giudizio. Flag: contati (tasso).
-6. **Perché una sola review per ordine?** `review_id` non è univoco (789 id su più ordini) e 547 ordini ne hanno due. La chiave naturale è l'ordine; si tiene la più recente. La media di due giudizi non ha senso.
+6. **Perché una sola review per ordine?** `review_id` non è univoco (789 id su più ordini) e 547 ordini ne hanno due (202 con voti diversi). La chiave naturale è l'ordine; si tiene la più recente. La media di due giudizi non ha senso.
 7. **Cos'è una dimensione con più ruoli?** La stessa `dim_date` referenziata tre volte da `fact_order` (acquisto, consegna, promessa). Un'unica tabella, tre chiavi esterne.
 8. **Cos'è una dimensione degenere?** `order_id`: identificatore nel fatto senza tabella dimensione. Serve per il drill-across e per contare gli ordini.
 9. **Perché `status_key` sta anche nel fatto a grana riga?** È una chiave, non una misura: replicarla non altera somme né medie, e consente lo slice "consegnati" senza join fra fatti.
@@ -130,7 +131,7 @@ SELECT * FROM dw.dim_date WHERE full_date = '2017-11-24';
 12. **Perché `is_late` confronta le date?** La data promessa non ha ora: confrontando i timestamp, 1.292 ordini consegnati il giorno promesso risulterebbero in ritardo.
 13. **ROLLUP, CUBE, GROUPING SETS: differenza?** ROLLUP: prefissi della gerarchia (a,b), (a), (). CUBE: tutti i sottoinsiemi. GROUPING SETS: quelli che scelgo io. `GROUPING()` distingue i subtotali dai NULL veri.
 14. **Cos'è il drill-across?** Combinare due fatti sulle dimensioni comuni (qui `order_id` + dimensioni conformi). Sessione 04: distanza e seller dalla riga, consegna dall'ordine.
-15. **Cosa sono le viste materializzate e perché non le usate nelle OLAP?** Risultato precalcolato, aggiornato con `REFRESH`. Ottimizzazione fisica: le OLAP sono scritte sui fatti per tracciabilità; le viste servono a mostrare il guadagno (270–1.900 ms → 4 ms).
+15. **Cosa sono le viste materializzate e perché non le usate nelle OLAP?** Risultato precalcolato, aggiornato con `REFRESH`. Ottimizzazione fisica: le OLAP sono scritte sui fatti per tracciabilità; le viste servono a mostrare il guadagno (270–1.900 ms → 4 ms sul cubo mensile; nella demo circa 110 ms → meno di 1 ms).
 16. **Perché escludete alcuni mesi nella stagionalità?** Set–dic 2016 (329 ordini) e set–ott 2018 (20) sono parziali: confrontarli con mesi pieni falsa la crescita. Lo slice è esplicito e commentato.
 17. **Il risultato più interessante?** Il ritardo rispetto alla promessa: sul giorno promesso 4.03, fino a una settimana dopo 2.71, oltre 1.67 (70 % di una stella). Penalità ≈ 2 stelle in ogni regione. Essere in anticipo non premia.
 18. **Quali sono i limiti?** Coordinate per prefisso CEP; anni parziali; macro-categorie definite da noi; `total_paid` ≠ prezzo + freight su pochi ordini (voucher, arrotondamenti).
